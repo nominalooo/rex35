@@ -387,7 +387,7 @@ def sanitize_for_json(obj):
     elif isinstance(obj, list):
         return [sanitize_for_json(item) for item in obj]
     elif hasattr(obj, '__dict__'):
-        # Convert API objects to dicts
+        # Convert API objects (TextBlock, ToolUseBlock, etc.) to dicts
         return sanitize_for_json(obj.__dict__)
     else:
         return obj
@@ -397,10 +397,10 @@ def save_conversation(messages: list):
     if HISTORY_F.exists():
         try: data = json.loads(HISTORY_F.read_text())
         except: data = []
-    # Sanitize messages before saving
+    # Sanitize messages before saving to avoid JSON serialization errors
     clean_msgs = sanitize_for_json(messages[-20:])
     data.append({"date": datetime.now().isoformat()[:16], "messages": clean_msgs})
-    data = data[-200:]
+    data = data[-200:]  # keep last 200 convos
     HISTORY_F.write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
 # ── FILE ENDPOINTS ──────────────────────────────────────────
