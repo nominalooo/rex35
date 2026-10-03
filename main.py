@@ -209,7 +209,7 @@ TOOLS = [
     },
     {
         "name": "web_search",
-        "description": "Search the internet using Exa (neural search). Returns titles, URLs, snippets and publication dates. Use for researching targets, CVEs, exploits, tools, documentation, anything.".
+       "description": "Search the internet using Exa (neural search). Returns titles, URLs, snippets and publication dates. Use for researching targets, CVEs, exploits, tools, documentation, anything.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -222,7 +222,7 @@ TOOLS = [
     },
     {
         "name": "web_fetch",
-        "description": "Fetch and parse a URL using Firecrawl. Returns clean markdown content. Handles JS-rendered pages, SPAs, anti-bot protection. Use for reading any webpage, source code, CVE pages.".
+        "description": "Fetch and parse a URL using Firecrawl. Returns clean markdown content. Handles JS-rendered pages, SPAs, anti-bot protection. Use for reading any webpage, source code, CVE pages.",
         "input_schema": {
             "type": "object",
             "properties": {
