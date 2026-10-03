@@ -380,13 +380,27 @@ def run_tool(name: str, inp: dict) -> str:
     return f"[Unknown tool: {name}]"
 
 # ── HISTORY PERSISTENCE ─────────────────────────────────────
+def sanitize_for_json(obj):
+    """Convert Claude API objects to JSON-serializable dicts"""
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_json(item) for item in obj]
+    elif hasattr(obj, '__dict__'):
+        # Convert API objects to dicts
+        return sanitize_for_json(obj.__dict__)
+    else:
+        return obj
+
 def save_conversation(messages: list):
     data = []
     if HISTORY_F.exists():
         try: data = json.loads(HISTORY_F.read_text())
         except: data = []
-    data.append({"date": datetime.now().isoformat()[:16], "messages": messages[-20:]})
-    data = data[-200:]  # keep last 200 convos
+    # Sanitize messages before saving
+    clean_msgs = sanitize_for_json(messages[-20:])
+    data.append({"date": datetime.now().isoformat()[:16], "messages": clean_msgs})
+    data = data[-200:]
     HISTORY_F.write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
 # ── FILE ENDPOINTS ──────────────────────────────────────────
