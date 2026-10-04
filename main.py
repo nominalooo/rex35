@@ -369,15 +369,53 @@ def do_search_history(query: str, limit: int = 10) -> str:
         return f"[History error] {e}"
 
 def run_tool(name: str, inp: dict) -> str:
-    if name == "run_shell":      return exec_shell(inp["command"], inp.get("timeout", 120))
-    if name == "run_python":     return exec_python(inp["code"], inp.get("timeout", 60))
-    if name == "write_file":     return do_write(inp["filename"], inp["content"])
-    if name == "read_file":      return do_read(inp["filename"], inp.get("max_lines", 200))
-    if name == "list_workspace": return do_list()
-    if name == "web_search":     return do_web_search(inp["query"], inp.get("num_results", 8), inp.get("include_text", False))
-    if name == "web_fetch":      return do_web_fetch(inp["url"], inp.get("formats", ["markdown"]))
-    if name == "search_history": return do_search_history(inp["query"], inp.get("limit", 10))
-    return f"[Unknown tool: {name}]"
+    if not isinstance(inp, dict):
+        return f"Error: {name} received invalid input (expected an object)"
+    try:
+        if name == "run_shell":
+            command = inp.get("command")
+            if not command:
+                return "Error: run_shell requires 'command' parameter"
+            return exec_shell(command, inp.get("timeout", 120))
+        if name == "run_python":
+            code = inp.get("code")
+            if not code:
+                return "Error: run_python requires 'code' parameter"
+            return exec_python(code, inp.get("timeout", 60))
+        if name == "write_file":
+            filename = inp.get("filename")
+            content = inp.get("content")
+            if not filename:
+                return "Error: write_file requires 'filename' parameter"
+            if content is None:
+                return "Error: write_file requires 'content' parameter"
+            return do_write(filename, content)
+        if name == "read_file":
+            filename = inp.get("filename")
+            if not filename:
+                return "Error: read_file requires 'filename' parameter"
+            return do_read(filename, inp.get("max_lines", 200))
+        if name == "list_workspace":
+            return do_list()
+        if name == "web_search":
+            query = inp.get("query")
+            if not query:
+                return "Error: web_search requires 'query' parameter"
+            return do_web_search(query, inp.get("num_results", 8), inp.get("include_text", False))
+        if name == "web_fetch":
+            url = inp.get("url")
+            if not url:
+                return "Error: web_fetch requires 'url' parameter"
+            return do_web_fetch(url, inp.get("formats", ["markdown"]))
+        if name == "search_history":
+            query = inp.get("query")
+            if not query:
+                return "Error: search_history requires 'query' parameter"
+            return do_search_history(query, inp.get("limit", 10))
+        return f"[Unknown tool: {name}]"
+    except Exception as e:
+        return f"Tool error: {e}"
+
 
 # ── HISTORY PERSISTENCE ─────────────────────────────────────
 def sanitize_for_json(obj):
