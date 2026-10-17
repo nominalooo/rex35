@@ -21,7 +21,7 @@ WORKSPACE  = BASE_DIR / "workspace"
 HISTORY_F  = BASE_DIR / "history.json"
 WORKSPACE.mkdir(exist_ok=True)
 
-SYSTEM = (BASE_DIR / "CLAUDE.MD").read_text(encoding="utf-8")
+SYSTEM = (BASE_DIR / "CLAUDE.md").read_text(encoding="utf-8")
 
 TOOLS AVAILABLE:
 - run_shell: bash commands, install binaries (gobuster/ffuf/nuclei/sqlmap/etc), wget/curl downloads
