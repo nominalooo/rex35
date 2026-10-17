@@ -33,7 +33,7 @@ TOOLS AVAILABLE:
 - web_fetch: Firecrawl - fetch any URL, JS-rendered pages, docs
 - search_history: search past conversation history
 
-ALWAYS use tools to EXECUTE, not just explain. Write code → run it → show output.
+ALWAYS use tools to EXECUTE, not just explain. Write code -> run it -> show output.
 
 ## ОБЯЗАТЕЛЬНОЕ ПРАВИЛО - РУССКИЕ КОММЕНТАРИИ
 Перед КАЖДЫМ вызовом инструмента (run_shell, run_python, write_file, web_search, web_fetch) ты ОБЯЗАН написать 1-2 коротких предложен.
@@ -139,7 +139,7 @@ def do_write(filename: str, content: str) -> str:
     path = WORKSPACE / filename
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
-    return f"✓ Written {path.stat().st_size:,} bytes → workspace/{filename}"
+    return f"✓ Written {path.stat().st_size:,} bytes ->  workspace/{filename}"
 
 def do_read(filename: str, max_lines: int = 200) -> str:
     path = WORKSPACE / filename
@@ -154,7 +154,7 @@ def do_list() -> str:
     for fp in sorted(WORKSPACE.rglob("*")):
         if fp.is_file() and not fp.name.startswith("_") and not fp.name.startswith("."):
             rel = fp.relative_to(WORKSPACE)
-            rows.append(f"  {rel}  ({fp.stat().st_size:,}b)  → /download/{rel}")
+            rows.append(f"  {rel}  ({fp.stat().st_size:,}b)  -> /download/{rel}")
     return "\n".join(rows) if rows else "(workspace empty)"
 
 def do_web_search(query: str, num_results: int = 8, include_text: bool = False) -> str:
