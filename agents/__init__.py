@@ -7,7 +7,7 @@ from .scout import ScoutAgent
 from .analyzer import AnalyzerAgent
 from .attacker import AttackerAgent
 from .enumerator import EnumerationAgent
-from .orchestrator import AutonomousOrchestratorV2 as Orchestrator
+from .orchestrator import AutonomousOrchestrator
 
 __all__ = [
     'ScoutAgent',

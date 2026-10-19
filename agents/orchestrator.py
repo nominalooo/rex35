@@ -1,5 +1,5 @@
 """
-AUTONOMOUS ORCHESTRATOR V2 — Chinese Killer Level
+AUTONOMOUS ORCHESTRATOR — Chinese Killer Level
 Улучшения:
 - Parallel execution всех агентов (asyncio)
 - Decision tree (автоматические решения)
@@ -18,7 +18,7 @@ from agents.attacker import AttackerAgent
 from agents.enumerator import EnumerationAgent
 from agents.persistence import PersistenceAgent
 
-class AutonomousOrchestratorV2:
+class AutonomousOrchestrator:
     def __init__(self, workspace: Path, db_path: Path, attacker_ip: str = "10.10.10.10", attacker_port: int = 4444):
         self.workspace = workspace
         self.db = PentestDB(db_path)
@@ -488,16 +488,13 @@ class AutonomousOrchestratorV2:
         self.db.close()
 
 
-# Alias for agents/__init__.py
-Orchestrator = AutonomousOrchestratorV2
-
 
 # ━━━ CLI ENTRY POINT ━━━
 if __name__ == "__main__":
     import sys
     
     if len(sys.argv) < 2:
-        print("Usage: python orchestrator_v2.py <target>")
+        print("Usage: python orchestrator.py <target>")
         sys.exit(1)
     
     target = sys.argv[1]
@@ -506,7 +503,7 @@ if __name__ == "__main__":
     
     workspace.mkdir(exist_ok=True)
     
-    orchestrator = AutonomousOrchestratorV2(workspace, db_path)
+    orchestrator = AutonomousOrchestrator(workspace, db_path)
     
     try:
         result = asyncio.run(orchestrator.execute_autonomous_scan(target))
