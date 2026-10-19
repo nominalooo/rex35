@@ -16,9 +16,8 @@ from agents.scout import ScoutAgent
 from agents.analyzer import AnalyzerAgent
 from agents.attacker import AttackerAgent
 from agents.enumerator import EnumerationAgent
-from agents.persistence import PersistenceAgent
 
-class AutonomousOrchestrator:
+class Orchestrator:
     def __init__(self, workspace: Path, db_path: Path, attacker_ip: str = "10.10.10.10", attacker_port: int = 4444):
         self.workspace = workspace
         self.db = PentestDB(db_path)
@@ -29,7 +28,6 @@ class AutonomousOrchestrator:
         self.analyzer = AnalyzerAgent(workspace)
         self.attacker = AttackerAgent(workspace)
         self.enumerator = EnumerationAgent(workspace, workspace.parent / "config" / "api_keys.json")
-        self.persistence = PersistenceAgent(workspace, attacker_ip, attacker_port)
         
         self.state = {
             "current_phase": "idle",
@@ -503,7 +501,7 @@ if __name__ == "__main__":
     
     workspace.mkdir(exist_ok=True)
     
-    orchestrator = AutonomousOrchestrator(workspace, db_path)
+    orchestrator = Orchestrator(workspace, db_path)
     
     try:
         result = asyncio.run(orchestrator.execute_autonomous_scan(target))
