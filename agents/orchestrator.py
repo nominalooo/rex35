@@ -553,6 +553,10 @@ class AutonomousOrchestrator:
         self.db.close()
 
 
+# Alias so agents/__init__.py can do: from .orchestrator import Orchestrator
+Orchestrator = AutonomousOrchestrator
+
+
 # ━━━ CLI ENTRY POINT ━━━
 if __name__ == "__main__":
     import sys

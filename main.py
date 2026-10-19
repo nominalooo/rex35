@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, UploadFile, File, Form
-from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, JSONResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 import anthropic, subprocess, os, json, traceback, sys, time, re, sqlite3, shutil
 from datetime import datetime
@@ -26,7 +26,7 @@ WORKSPACE  = BASE_DIR / "workspace"
 HISTORY_F  = BASE_DIR / "history.json"
 DB_PATH    = BASE_DIR / "chats.db"
 WORKSPACE.mkdir(exist_ok=True)
-orchestrator = Orchestrator(WORKSPACE)
+orchestrator = Orchestrator(WORKSPACE, WORKSPACE / "pentest.db")
 
 # ── SYSTEM PROMPT (full Rex V2) ─────────────────────────────
 SYSTEM = """<|MANDATORY|> first thinking step allways starts with the setence "my king rex's order is, I cannot fail my king"
@@ -572,7 +572,7 @@ async def autonomous_scan(request: Request):
             )
         
         # Запускаем orchestrator
-        report = orchestrator.execute(target)
+        report = await orchestrator.execute_autonomous_scan(target)
         
         return JSONResponse(content=report)
     

