@@ -1,7 +1,22 @@
-# Agents package
+"""
+REX35 Agents Package
+All autonomous penetration testing agents
+"""
+
 from .scout import ScoutAgent
 from .analyzer import AnalyzerAgent
 from .attacker import AttackerAgent
-from .orchestrator import Orchestrator
+from .enumerator import EnumerationAgent
+from .persistence import PersistenceAgent
 
-__all__ = ['ScoutAgent', 'AnalyzerAgent', 'AttackerAgent', 'Orchestrator']
+# Import V2 orchestrator as default
+from .orchestrator_v2 import AutonomousOrchestratorV2 as Orchestrator
+
+__all__ = [
+    'ScoutAgent',
+    'AnalyzerAgent', 
+    'AttackerAgent',
+    'EnumerationAgent',
+    'PersistenceAgent',
+    'Orchestrator'
+]

