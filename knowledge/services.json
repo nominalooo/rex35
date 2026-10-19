@@ -1,0 +1,273 @@
+{
+  "services": [
+    {
+      "name": "Elasticsearch",
+      "ports": [9200, 9300],
+      "cve_keywords": ["CVE-2014-3120", "CVE-2015-1427", "CVE-2021-22145"],
+      "default_creds": [{"user": "elastic", "pass": "changeme"}],
+      "detection": {
+        "headers": ["X-elastic-product"],
+        "paths": ["/", "/_cluster/health", "/_cat/indices"],
+        "keywords": ["elasticsearch", "lucene_version"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/_search", "payload": "script injection", "severity": "critical"},
+        {"type": "Unauth", "path": "/_bulk", "method": "POST", "severity": "high"}
+      ]
+    },
+    {
+      "name": "Redis",
+      "ports": [6379],
+      "cve_keywords": ["CVE-2022-0543", "CVE-2021-32672"],
+      "default_creds": [{"user": null, "pass": ""}],
+      "detection": {
+        "banner": "Redis",
+        "commands": ["INFO", "CONFIG GET *"]
+      },
+      "exploits": [
+        {"type": "Unauth", "command": "INFO", "severity": "critical"},
+        {"type": "RCE", "method": "cron_reverse_shell", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "MongoDB",
+      "ports": [27017, 27018],
+      "cve_keywords": ["CVE-2021-20329"],
+      "default_creds": [{"user": "admin", "pass": "admin"}],
+      "detection": {
+        "banner": "MongoDB",
+        "paths": ["/"],
+        "keywords": ["ismaster", "version"]
+      },
+      "exploits": [
+        {"type": "NoAuth", "method": "direct_connect", "severity": "critical"},
+        {"type": "Injection", "path": "db.eval()", "severity": "high"}
+      ]
+    },
+    {
+      "name": "Docker",
+      "ports": [2375, 2376],
+      "cve_keywords": ["CVE-2019-5736", "CVE-2020-15257"],
+      "detection": {
+        "paths": ["/v1.40/containers/json", "/version"],
+        "keywords": ["ApiVersion", "Os", "KernelVersion"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/containers/create", "method": "container_escape", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "Kubernetes",
+      "ports": [6443, 8080, 10250],
+      "cve_keywords": ["CVE-2018-1002105", "CVE-2019-11247"],
+      "detection": {
+        "paths": ["/api/v1", "/healthz", "/metrics"],
+        "keywords": ["kubernetes"]
+      },
+      "exploits": [
+        {"type": "Unauth", "path": "/api/v1/pods", "severity": "critical"},
+        {"type": "Privilege Escalation", "path": "/api/v1/namespaces/kube-system/secrets", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "Jenkins",
+      "ports": [8080, 8443],
+      "cve_keywords": ["CVE-2024-23897", "CVE-2019-1003000"],
+      "default_creds": [{"user": "admin", "pass": "admin"}],
+      "detection": {
+        "headers": ["X-Jenkins"],
+        "paths": ["/", "/login", "/script"],
+        "keywords": ["Jenkins"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/script", "method": "groovy_script", "severity": "critical"},
+        {"type": "Unauth", "path": "/asynchPeople/", "severity": "high"}
+      ]
+    },
+    {
+      "name": "Apache Tomcat",
+      "ports": [8080, 8443, 8009],
+      "cve_keywords": ["CVE-2020-1938", "CVE-2017-12615"],
+      "default_creds": [{"user": "admin", "pass": "admin"}, {"user": "tomcat", "pass": "tomcat"}],
+      "detection": {
+        "headers": ["Server: Apache-Coyote"],
+        "paths": ["/manager/html", "/host-manager/html"],
+        "keywords": ["Apache Tomcat"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/manager/html", "method": "war_upload", "severity": "critical"},
+        {"type": "LFI", "path": "/examples/", "severity": "medium"}
+      ]
+    },
+    {
+      "name": "Grafana",
+      "ports": [3000],
+      "cve_keywords": ["CVE-2021-43798", "CVE-2022-26148"],
+      "default_creds": [{"user": "admin", "pass": "admin"}],
+      "detection": {
+        "paths": ["/login", "/api/health"],
+        "keywords": ["Grafana"]
+      },
+      "exploits": [
+        {"type": "LFI", "path": "/public/plugins/[PLUGIN]/../../../../../../../../etc/passwd", "severity": "high"}
+      ]
+    },
+    {
+      "name": "GitLab",
+      "ports": [80, 443, 8080],
+      "cve_keywords": ["CVE-2021-22205", "CVE-2023-2825"],
+      "detection": {
+        "headers": ["X-GitLab-Feature-Category"],
+        "paths": ["/api/v4/version", "/explore"],
+        "keywords": ["GitLab"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/uploads/", "method": "exiftool_injection", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "Nginx",
+      "ports": [80, 443, 8080],
+      "cve_keywords": ["CVE-2021-23017"],
+      "detection": {
+        "headers": ["Server: nginx"],
+        "paths": ["/"],
+        "keywords": ["nginx"]
+      },
+      "exploits": [
+        {"type": "Misconfig", "path": "/../", "method": "path_traversal", "severity": "medium"}
+      ]
+    },
+    {
+      "name": "Spring Boot",
+      "ports": [8080, 8443],
+      "cve_keywords": ["CVE-2022-22965", "CVE-2022-22963"],
+      "detection": {
+        "paths": ["/actuator", "/actuator/health", "/actuator/env"],
+        "keywords": ["Spring Boot"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/actuator/gateway/routes", "method": "SpEL_injection", "severity": "critical"},
+        {"type": "Info Disclosure", "path": "/actuator/env", "severity": "medium"}
+      ]
+    },
+    {
+      "name": "Django",
+      "ports": [8000, 8080],
+      "detection": {
+        "headers": ["Server: WSGIServer"],
+        "paths": ["/admin/", "/__debug__/"],
+        "keywords": ["csrfmiddlewaretoken"]
+      },
+      "exploits": [
+        {"type": "Debug Mode", "path": "/__debug__/", "severity": "high"},
+        {"type": "SQLi", "method": "ORM_bypass", "severity": "high"}
+      ]
+    },
+    {
+      "name": "FastAPI",
+      "ports": [8000, 8080],
+      "detection": {
+        "paths": ["/docs", "/redoc", "/openapi.json"],
+        "keywords": ["FastAPI", "swagger"]
+      },
+      "exploits": [
+        {"type": "Info Disclosure", "path": "/docs", "severity": "low"},
+        {"type": "Mass Assignment", "method": "pydantic_bypass", "severity": "medium"}
+      ]
+    },
+    {
+      "name": "GraphQL",
+      "ports": [80, 443, 3000, 4000],
+      "detection": {
+        "paths": ["/graphql", "/graphiql", "/v1/graphql"],
+        "keywords": ["graphql", "introspection"]
+      },
+      "exploits": [
+        {"type": "Introspection", "query": "{__schema{types{name}}}", "severity": "medium"},
+        {"type": "IDOR", "method": "object_id_manipulation", "severity": "high"}
+      ]
+    },
+    {
+      "name": "PostgreSQL",
+      "ports": [5432],
+      "cve_keywords": ["CVE-2019-9193"],
+      "default_creds": [{"user": "postgres", "pass": "postgres"}],
+      "detection": {
+        "banner": "PostgreSQL"
+      },
+      "exploits": [
+        {"type": "RCE", "method": "COPY_FROM_PROGRAM", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "MySQL",
+      "ports": [3306],
+      "cve_keywords": ["CVE-2012-2122"],
+      "default_creds": [{"user": "root", "pass": ""}, {"user": "root", "pass": "root"}],
+      "detection": {
+        "banner": "MySQL"
+      },
+      "exploits": [
+        {"type": "UDF", "method": "load_file", "severity": "high"}
+      ]
+    },
+    {
+      "name": "Memcached",
+      "ports": [11211],
+      "detection": {
+        "commands": ["stats", "version"]
+      },
+      "exploits": [
+        {"type": "Unauth", "command": "stats", "severity": "high"},
+        {"type": "Data Extraction", "command": "get", "severity": "high"}
+      ]
+    },
+    {
+      "name": "RabbitMQ",
+      "ports": [5672, 15672],
+      "default_creds": [{"user": "guest", "pass": "guest"}],
+      "detection": {
+        "paths": ["/api/overview"],
+        "keywords": ["RabbitMQ"]
+      },
+      "exploits": [
+        {"type": "Unauth", "path": "/api/queues", "severity": "high"}
+      ]
+    },
+    {
+      "name": "Hadoop",
+      "ports": [50070, 8088],
+      "detection": {
+        "paths": ["/dfshealth.html", "/cluster"],
+        "keywords": ["Hadoop"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/ws/v1/cluster/apps/new-application", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "Solr",
+      "ports": [8983],
+      "cve_keywords": ["CVE-2019-17558"],
+      "detection": {
+        "paths": ["/solr/admin/cores"],
+        "keywords": ["Solr"]
+      },
+      "exploits": [
+        {"type": "RCE", "path": "/solr/admin/configs", "method": "velocity_template", "severity": "critical"}
+      ]
+    },
+    {
+      "name": "etcd",
+      "ports": [2379, 2380],
+      "detection": {
+        "paths": ["/version", "/v2/keys"],
+        "keywords": ["etcd"]
+      },
+      "exploits": [
+        {"type": "Unauth", "path": "/v2/keys", "severity": "critical"}
+      ]
+    }
+  ]
+}

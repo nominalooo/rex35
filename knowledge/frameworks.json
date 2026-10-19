@@ -1,0 +1,320 @@
+{
+  "frameworks": [
+    {
+      "name": "Django",
+      "language": "Python",
+      "detection": {
+        "headers": ["Server: WSGIServer"],
+        "paths": ["/admin/", "/static/admin/", "/__debug__/"],
+        "keywords": ["csrfmiddlewaretoken", "django", "DjangoTemplates"],
+        "files": ["manage.py", "wsgi.py", "settings.py"]
+      },
+      "common_endpoints": [
+        "/admin/",
+        "/accounts/login/",
+        "/api/",
+        "/__debug__/",
+        "/static/",
+        "/media/"
+      ],
+      "vulnerabilities": [
+        {"type": "Debug Mode Leak", "path": "/__debug__/", "severity": "high"},
+        {"type": "Admin Panel", "path": "/admin/", "severity": "medium"},
+        {"type": "SSTI", "template_engine": "Jinja2", "severity": "critical"},
+        {"type": "SQLi", "method": "ORM bypass with raw()", "severity": "high"},
+        {"type": "CSRF", "bypass": "missing CSRF token validation", "severity": "medium"}
+      ],
+      "default_configs": {
+        "debug": false,
+        "secret_key": "check settings.py leak",
+        "allowed_hosts": ["*"]
+      }
+    },
+    {
+      "name": "FastAPI",
+      "language": "Python",
+      "detection": {
+        "paths": ["/docs", "/redoc", "/openapi.json"],
+        "keywords": ["FastAPI", "swagger", "openapi"],
+        "headers": ["content-type: application/json"]
+      },
+      "common_endpoints": [
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+        "/api/v1/",
+        "/health",
+        "/metrics"
+      ],
+      "vulnerabilities": [
+        {"type": "API Schema Exposure", "path": "/openapi.json", "severity": "low"},
+        {"type": "Mass Assignment", "method": "Pydantic model manipulation", "severity": "medium"},
+        {"type": "IDOR", "method": "path parameter manipulation", "severity": "high"},
+        {"type": "NoSQL Injection", "if_using": "MongoDB with Motor", "severity": "high"}
+      ],
+      "default_configs": {
+        "docs_url": "/docs",
+        "redoc_url": "/redoc",
+        "openapi_url": "/openapi.json"
+      }
+    },
+    {
+      "name": "Flask",
+      "language": "Python",
+      "detection": {
+        "headers": ["Server: Werkzeug"],
+        "keywords": ["flask", "werkzeug"],
+        "paths": ["/static/"],
+        "error_pages": ["werkzeug debugger"]
+      },
+      "common_endpoints": [
+        "/static/",
+        "/api/",
+        "/admin/",
+        "/login",
+        "/console"
+      ],
+      "vulnerabilities": [
+        {"type": "Debug Mode RCE", "condition": "debug=True", "severity": "critical"},
+        {"type": "SSTI", "template_engine": "Jinja2", "payload": "{{7*7}}", "severity": "critical"},
+        {"type": "Session Cookie", "method": "decode Flask session", "severity": "high"},
+        {"type": "Path Traversal", "send_file_misconfig": true, "severity": "medium"}
+      ],
+      "default_configs": {
+        "debug": false,
+        "secret_key": "check for weak/hardcoded key"
+      }
+    },
+    {
+      "name": "Express.js",
+      "language": "Node.js",
+      "detection": {
+        "headers": ["X-Powered-By: Express"],
+        "keywords": ["express"],
+        "paths": ["/api/", "/graphql"]
+      },
+      "common_endpoints": [
+        "/api/",
+        "/graphql",
+        "/health",
+        "/admin",
+        "/.env"
+      ],
+      "vulnerabilities": [
+        {"type": "Prototype Pollution", "method": "JSON.parse abuse", "severity": "high"},
+        {"type": "Path Traversal", "express.static_misconfig": true, "severity": "medium"},
+        {"type": "NoSQL Injection", "if_using": "MongoDB", "severity": "high"},
+        {"type": "JWT Misconfiguration", "method": "weak secret, algorithm confusion", "severity": "high"}
+      ],
+      "default_configs": {
+        "trust_proxy": false,
+        "view_cache": true
+      }
+    },
+    {
+      "name": "Next.js",
+      "language": "Node.js",
+      "detection": {
+        "headers": ["x-nextjs-cache", "x-vercel-id"],
+        "paths": ["/_next/", "/api/", "/__nextjs_original-stack-frame"],
+        "keywords": ["__next", "next.js"]
+      },
+      "common_endpoints": [
+        "/_next/static/",
+        "/api/",
+        "/__nextjs_original-stack-frame",
+        "/.next/",
+        "/api/auth/"
+      ],
+      "vulnerabilities": [
+        {"type": "SSRF", "method": "getServerSideProps abuse", "severity": "high"},
+        {"type": "Open Redirect", "next/link": "href manipulation", "severity": "medium"},
+        {"type": "API Route Exposure", "path": "/api/*", "severity": "medium"},
+        {"type": "Source Map Exposure", "path": "/_next/static/chunks/*.js.map", "severity": "low"}
+      ],
+      "default_configs": {
+        "distDir": ".next",
+        "reactStrictMode": true
+      }
+    },
+    {
+      "name": "NestJS",
+      "language": "Node.js",
+      "detection": {
+        "paths": ["/graphql", "/api/"],
+        "keywords": ["nestjs"],
+        "error_messages": ["NestJS"]
+      },
+      "common_endpoints": [
+        "/graphql",
+        "/api/",
+        "/health",
+        "/swagger",
+        "/docs"
+      ],
+      "vulnerabilities": [
+        {"type": "GraphQL Introspection", "path": "/graphql", "severity": "medium"},
+        {"type": "TypeORM SQLi", "raw_query_abuse": true, "severity": "high"},
+        {"type": "JWT", "guard_bypass": true, "severity": "high"}
+      ]
+    },
+    {
+      "name": "Spring Boot",
+      "language": "Java",
+      "detection": {
+        "headers": ["X-Application-Context"],
+        "paths": ["/actuator", "/actuator/health", "/actuator/env"],
+        "keywords": ["Whitelabel Error Page", "spring"]
+      },
+      "common_endpoints": [
+        "/actuator",
+        "/actuator/env",
+        "/actuator/health",
+        "/actuator/metrics",
+        "/actuator/gateway/routes",
+        "/actuator/heapdump",
+        "/api/",
+        "/swagger-ui.html",
+        "/v2/api-docs"
+      ],
+      "vulnerabilities": [
+        {"type": "Spring4Shell", "cve": "CVE-2022-22965", "severity": "critical"},
+        {"type": "SpEL Injection", "path": "/actuator/gateway/routes", "severity": "critical"},
+        {"type": "Actuator Exposure", "paths": ["/actuator/*"], "severity": "high"},
+        {"type": "Heapdump", "path": "/actuator/heapdump", "contains": "credentials", "severity": "critical"},
+        {"type": "Env Disclosure", "path": "/actuator/env", "severity": "high"}
+      ],
+      "default_configs": {
+        "management.endpoints.web.exposure.include": "*",
+        "spring.cloud.gateway.enabled": true
+      }
+    },
+    {
+      "name": "Laravel",
+      "language": "PHP",
+      "detection": {
+        "headers": ["Set-Cookie: laravel_session"],
+        "keywords": ["laravel", "Illuminate"],
+        "paths": ["/public/", "/storage/"],
+        "error_pages": ["Laravel", "Symfony"]
+      },
+      "common_endpoints": [
+        "/api/",
+        "/storage/",
+        "/public/",
+        "/.env",
+        "/telescope",
+        "/horizon",
+        "/log-viewer"
+      ],
+      "vulnerabilities": [
+        {"type": ".env Exposure", "path": "/.env", "severity": "critical"},
+        {"type": "Debug Mode", "APP_DEBUG=true": "stack traces", "severity": "high"},
+        {"type": "Telescope", "path": "/telescope", "severity": "high"},
+        {"type": "Unserialize RCE", "method": "Laravel deserialization", "severity": "critical"},
+        {"type": "SQL Injection", "eloquent_raw_queries": true, "severity": "high"}
+      ],
+      "default_configs": {
+        "APP_DEBUG": false,
+        "APP_KEY": "check if exposed"
+      }
+    },
+    {
+      "name": "Ruby on Rails",
+      "language": "Ruby",
+      "detection": {
+        "headers": ["X-Runtime", "X-Request-Id"],
+        "keywords": ["rails", "ruby"],
+        "paths": ["/rails/info/", "/assets/"]
+      },
+      "common_endpoints": [
+        "/rails/info/routes",
+        "/rails/info/properties",
+        "/assets/",
+        "/api/",
+        "/admin"
+      ],
+      "vulnerabilities": [
+        {"type": "CVE-2019-5418", "path_traversal": "/assets/file:%2F%2F%2Fetc%2Fpasswd", "severity": "high"},
+        {"type": "Mass Assignment", "method": "strong parameters bypass", "severity": "high"},
+        {"type": "YAML Deserialization", "CVE": "CVE-2013-0156", "severity": "critical"},
+        {"type": "Routes Exposure", "path": "/rails/info/routes", "severity": "low"}
+      ]
+    },
+    {
+      "name": "GraphQL",
+      "language": "Various",
+      "detection": {
+        "paths": ["/graphql", "/graphiql", "/v1/graphql", "/api/graphql"],
+        "keywords": ["graphql", "query", "mutation"],
+        "content_type": "application/graphql"
+      },
+      "common_endpoints": [
+        "/graphql",
+        "/graphiql",
+        "/v1/graphql",
+        "/api/graphql",
+        "/__graphql"
+      ],
+      "vulnerabilities": [
+        {"type": "Introspection", "query": "{__schema{types{name}}}", "severity": "medium"},
+        {"type": "IDOR", "method": "object ID manipulation in queries", "severity": "high"},
+        {"type": "DoS", "method": "nested query depth attack", "severity": "medium"},
+        {"type": "Batch Attack", "method": "mutation batching for brute force", "severity": "high"},
+        {"type": "Field Suggestions", "typo_suggestions": "leak schema", "severity": "low"}
+      ],
+      "attack_queries": {
+        "introspection": "query { __schema { types { name fields { name type { name } } } } }",
+        "batch_attack": "[{\"query\":\"mutation{login(user:\\\"admin\\\",pass:\\\"pass1\\\")}{token}\"},{\"query\":\"mutation{login(user:\\\"admin\\\",pass:\\\"pass2\\\")}{token}\"}]",
+        "nested_query": "query { user { posts { comments { user { posts { comments { id } } } } } } }"
+      }
+    },
+    {
+      "name": "Strapi",
+      "language": "Node.js",
+      "detection": {
+        "headers": ["x-powered-by: Strapi"],
+        "paths": ["/admin", "/api/", "/graphql"],
+        "keywords": ["strapi"]
+      },
+      "common_endpoints": [
+        "/admin",
+        "/api/",
+        "/graphql",
+        "/uploads/",
+        "/_health"
+      ],
+      "vulnerabilities": [
+        {"type": "Admin Panel", "default_creds": "check /admin", "severity": "high"},
+        {"type": "CVE-2023-22894", "RCE": "plugin upload", "severity": "critical"},
+        {"type": "GraphQL Introspection", "enabled_by_default": true, "severity": "medium"},
+        {"type": "Unrestricted File Upload", "path": "/uploads/", "severity": "high"}
+      ]
+    },
+    {
+      "name": "WordPress",
+      "language": "PHP",
+      "detection": {
+        "paths": ["/wp-admin/", "/wp-content/", "/wp-includes/", "/wp-json/"],
+        "keywords": ["wordpress", "wp-content"],
+        "headers": ["link: <https://site.com/wp-json/>"]
+      },
+      "common_endpoints": [
+        "/wp-admin/",
+        "/wp-login.php",
+        "/wp-json/wp/v2/users",
+        "/wp-content/plugins/",
+        "/wp-content/uploads/",
+        "/xmlrpc.php",
+        "/readme.html"
+      ],
+      "vulnerabilities": [
+        {"type": "User Enumeration", "path": "/wp-json/wp/v2/users", "severity": "low"},
+        {"type": "XMLRPC", "path": "/xmlrpc.php", "method": "pingback SSRF", "severity": "medium"},
+        {"type": "Plugin Vulnerabilities", "check": "wpscan database", "severity": "varies"},
+        {"type": "File Upload", "method": "media library abuse", "severity": "high"},
+        {"type": "SQL Injection", "common_in": "plugins", "severity": "high"}
+      ]
+    }
+  ]
+}
