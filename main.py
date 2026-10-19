@@ -526,9 +526,7 @@ async def delete_chat(chat_id: int):
 async def stop_chat(chat_id: int):
     # Signal is handled client-side via AbortController; this is a no-op ack
     return {"ok": True}
-        finally:
-        db.close()
-        
+
 @app.get("/api/reports/latest")
 async def get_latest_report():
     """Получить последний pentest отчёт"""
