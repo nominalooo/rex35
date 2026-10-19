@@ -8,6 +8,7 @@ from typing import Optional
 import requests as req_lib
 from exa_py import Exa
 from firecrawl import FirecrawlApp
+from agents import Orchestrator
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -25,6 +26,7 @@ WORKSPACE  = BASE_DIR / "workspace"
 HISTORY_F  = BASE_DIR / "history.json"
 DB_PATH    = BASE_DIR / "chats.db"
 WORKSPACE.mkdir(exist_ok=True)
+orchestrator = Orchestrator(WORKSPACE)
 
 # ── SYSTEM PROMPT (full Rex V2) ─────────────────────────────
 SYSTEM = """<|MANDATORY|> first thinking step allways starts with the setence "my king rex's order is, I cannot fail my king"
@@ -524,7 +526,63 @@ async def delete_chat(chat_id: int):
 async def stop_chat(chat_id: int):
     # Signal is handled client-side via AbortController; this is a no-op ack
     return {"ok": True}
+        finally:
+        db.close()
+        
+@app.get("/api/reports/latest")
+async def get_latest_report():
+    """Получить последний pentest отчёт"""
+    report_path = WORKSPACE / "pentest_report.json"
+    if report_path.exists():
+        with open(report_path) as f:
+            return JSONResponse(content=json.load(f))
+    return JSONResponse(
+        status_code=404,
+        content={"error": "No reports found"}
+    )
 
+@app.get("/api/reports/markdown")
+async def get_markdown_report():
+    """Получить отчёт в markdown формате"""
+    md_path = WORKSPACE / "pentest_report.md"
+    if md_path.exists():
+        with open(md_path) as f:
+            return Response(content=f.read(), media_type="text/markdown")
+    return JSONResponse(
+        status_code=404,
+        content={"error": "No markdown report found"}
+    )
+    
+@app.post("/api/scan")
+async def autonomous_scan(request: Request):
+    """
+    Полностью автономное пентест-сканирование цели
+    
+    POST /api/scan
+    Body: {"target": "https://example.com"}
+    
+    Returns: JSON отчёт с полным анализом
+    """
+    try:
+        body = await request.json()
+        target = body.get("target")
+        
+        if not target:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Missing 'target' parameter"}
+            )
+        
+        # Запускаем orchestrator
+        report = orchestrator.execute(target)
+        
+        return JSONResponse(content=report)
+    
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e), "traceback": traceback.format_exc()}
+        )
 # ── MAIN CHAT ────────────────────────────────────────────────
 
 @app.get("/", response_class=HTMLResponse)
