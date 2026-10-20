@@ -5,3 +5,16 @@ python-multipart==0.0.20
 requests==2.32.3
 exa-py==1.8.5
 firecrawl-py==1.9.0
+
+# Automation & Browser
+playwright==1.48.0
+
+# Security APIs
+shodan==1.31.0
+censys==2.2.12
+
+# Additional utilities
+aiohttp==3.10.11
+beautifulsoup4==4.12.3
+lxml==5.3.0
+python-dotenv==1.0.1

